@@ -33,6 +33,9 @@ async def on_message(message):
 async def on_reaction_add(reaction, user):
     if reaction.message.author == user:
         return #if someone upvotes themselves, do nothing
+    
+    elif reaction.message.author == client.user:
+        return #if someone upvotes the but, do nothing
 
     userid = str(reaction.message.author.id)
     if reaction.emoji == config['upvoteEmoji']:
