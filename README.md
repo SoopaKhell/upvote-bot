@@ -1,5 +1,8 @@
 # upvote-bot
-upvote bot for commie hole server
+Upvote bot for commie hole server
+
+# Running
+Run bot.py
 
 # TODO
 
