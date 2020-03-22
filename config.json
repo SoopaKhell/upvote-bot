@@ -1,0 +1,11 @@
+{
+	"token": "TOKEN_HERE",
+	"scores": "scores.json",
+	"upvoteEmoji": "⬆️",
+	"downvoteEmoji": "⬇️",
+	"prefix": "!",
+	"upvoteCommand": "upvote",
+	"downvoteCommand": "downvote",
+	"scoresCommand": "scores",
+	"scoreName": "updoots"
+}
