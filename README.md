@@ -1,5 +1,5 @@
 # upvote-bot
-Upvote bot for commie hole server (Python 3)
+Upvote bot for Discord written in Python 3
 
 # Running
 Add your token to `config.json`
