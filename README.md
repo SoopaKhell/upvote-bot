@@ -11,3 +11,5 @@ You may have to run with `sudo` to get file writing permissions if you're on Lin
 # TODO
 
 * Auto add reactions to images
+* Bot cannot change score with reaction
+* Give a configurable amount of karma when someone successfully bumps the server on Disboard
