@@ -59,8 +59,8 @@ async def on_message(message):
         await message.channel.send(embed=scoreBoard)
 @client.event
 async def on_reaction_add(reaction, user):
-    #if reaction.message.author == user:
-     #   return # if someone upvotes themselves, do nothing
+    if reaction.message.author == user:
+        return # if someone upvotes themselves, do nothing
 
     user = reaction.message.author
     if reaction.emoji == config['upvoteEmoji']:
