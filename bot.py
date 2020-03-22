@@ -40,7 +40,8 @@ async def on_message(message):
         setScores(scores)
 
     elif message.content.startswith(config['prefix']+config['downvoteCommand']):
-        lastMessage = await message.channel.history(limit=2).flatten()[1]
+        lastMessage = await message.channel.history(limit=2).flatten()
+        lastMessage = lastMessage[1]
         if lastMessage.author == message.author:
             return
 
