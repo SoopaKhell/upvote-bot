@@ -73,7 +73,7 @@ async def on_message(message):
             await message.channel.send(
                 last_messages[1].author.mention
                 + " thanks for the bump. Have "
-                + config["bump_score"]
+                + str(config["bump_score"])
                 + " "
                 + config["score_name"]
                 + "!"
@@ -101,6 +101,8 @@ async def on_reaction_add(reaction, user):
     if user == client.user:
         return  # if the bot made the reaction, do nothing
     # otherwise, we know it is a genuine reaction
+
+    print("reaction")
 
     author_id = str(reaction.message.author.id)
     if reaction.emoji == config["upvote_emoji"]:
