@@ -1,13 +1,13 @@
 {
 	"token": "TOKEN_HERE",
 	"scores": "scores.json",
-	"upvoteEmoji": "⬆️",
-	"downvoteEmoji": "⬇️",
+	"upvote_emoji": "⬆️",
+	"downvote_emoji": "⬇️",
 	"prefix": "!",
-	"upvoteCommand": "upvote",
-	"downvoteCommand": "downvote",
-	"scoresCommand": "scores",
-	"scoreName": "updoots",
-	"topEmoji": "★",
-	"bumpScore": 5
+	"upvote_command": "upvote",
+	"downvote_command": "downvote",
+	"scores_command": "scores",
+	"score_name": "updoots",
+	"top_emoji": "★",
+	"bump_score": 5
 }
