@@ -102,13 +102,30 @@ async def on_reaction_add(reaction, user):
         return  # if the bot made the reaction, do nothing
     # otherwise, we know it is a genuine reaction
 
-    print("reaction")
-
     author_id = str(reaction.message.author.id)
     if reaction.emoji == config["upvote_emoji"]:
         add_score(author_id, 1)
     elif reaction.emoji == config["downvote_emoji"]:
         add_score(author_id, -1)
+
+    set_scores(scores)
+
+
+@client.event
+async def on_reaction_remove(reaction, user):
+    if reaction.message.author == user:
+        return  # if someone removes a reaction from themselves, do nothing
+    if reaction.message.author == client.user:
+        return  # if someone removes a reaction from the bot, do nothing
+    if user == client.user:
+        return  # if the bot removed the reaction, do nothing
+    # otherwise, we know it is a genuine reaction
+
+    author_id = str(reaction.message.author.id)
+    if reaction.emoji == config["upvote_emoji"]:
+        add_score(author_id, -1)
+    elif reaction.emoji == config["downvote_emoji"]:
+        add_score(author_id, 1)
 
     set_scores(scores)
 
