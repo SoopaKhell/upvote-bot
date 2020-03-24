@@ -7,5 +7,7 @@
 	"upvoteCommand": "upvote",
 	"downvoteCommand": "downvote",
 	"scoresCommand": "scores",
-	"scoreName": "updoots"
+	"scoreName": "updoots",
+	"topEmoji": "★",
+	"bumpScore": 5
 }
