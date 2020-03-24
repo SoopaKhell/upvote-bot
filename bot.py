@@ -45,6 +45,7 @@ def format_scores(d):
     string.strip()
     return string
 
+
 def add_score(author_id, score):
     """Add score to to a user by id"""
     if author_id in scores:
@@ -52,9 +53,15 @@ def add_score(author_id, score):
     else:
         scores[author_id] = score
 
+
 @bot.listen()
 async def on_ready():
-    print("Started on {}#{} ({})".format(bot.user.name, bot.user.discriminator, bot.user.id))
+    print(
+        "Started on {}#{} ({})".format(
+            bot.user.name, bot.user.discriminator, bot.user.id
+        )
+    )
+
 
 @bot.listen()
 async def on_message(message):
@@ -65,7 +72,7 @@ async def on_message(message):
         await message.add_reaction(config["downvote_emoji"])
     elif message.author.id == 302050872383242240:  # disboard bot id
         if "wait" not in message.embeds[0].description:
-            last_messages = await channel.history(limit=2).flatten()
+            last_messages = await message.channel.history(limit=2).flatten()
             author_id = str(last_messages[1].author.id)
             add_score(author_id, config["bump_score"])
             await message.channel.send(
@@ -121,13 +128,10 @@ async def on_reaction_remove(reaction, user):
 async def _scores(context):
     score_board = Embed()
     score_board.add_field(
-            name="Top "
-            + config["score_name"]
-            + " for **"
-            + context.message.channel.guild.name
-            + "**",
-            value="```" + config["top_emoji"] + " " + format_scores(scores) + "```",
+        name="Top " + config["score_name"] + " for **" + context.guild.name + "**",
+        value="```" + config["top_emoji"] + " " + format_scores(scores) + "```",
     )
     await context.send(embed=score_board)
+
 
 bot.run(config["token"])
