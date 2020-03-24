@@ -1,13 +1,16 @@
-import discord
-import re
+from discord import Embed
+from discord.ext import commands
 from config import get_config
 from scores import get_scores
 from scores import set_scores
+from re import match
+import asyncio
 
 global scores
-client = discord.Client()
+
 config = get_config("config.json")
 scores = get_scores()
+bot = commands.Bot(command_prefix=config["prefix"])
 
 yt_pattern = r"https?:\/\/(www\.)?(youtube\.com|youtu\.be)\/watch\?v=.+"
 
@@ -21,7 +24,7 @@ def format_scores(d):
     topUser = True
     for k, v in d.items():
         try:
-            name = client.get_user(int(k)).name
+            name = bot.get_user(int(k)).name
             if topUser:
                 userlen = len(name) + len(str(v)) + 4
                 topUser = False
@@ -42,32 +45,27 @@ def format_scores(d):
     string.strip()
     return string
 
-
 def add_score(author_id, score):
+    """Add score to to a user by id"""
     if author_id in scores:
         scores[author_id] += score
     else:
         scores[author_id] = score
 
-
-@client.event
+@bot.listen()
 async def on_ready():
-    print("started")
+    print("Started on {}#{} ({})".format(bot.user.name, bot.user.discriminator, bot.user.id))
 
-
-@client.event
+@bot.listen()
 async def on_message(message):
-    if message.author == client.user:
+    if message.author == bot.user:
         return  # if it's the bot's message, do nothing
-    if message.attachments != []:  # if the message has an attachment
-        await message.add_reaction(config["upvote_emoji"])
-        await message.add_reaction(config["downvote_emoji"])
-    elif re.match(yt_pattern, message.content):
+    if message.attachments != [] or match(yt_pattern, message.content):
         await message.add_reaction(config["upvote_emoji"])
         await message.add_reaction(config["downvote_emoji"])
     elif message.author.id == 302050872383242240:  # disboard bot id
         if "wait" not in message.embeds[0].description:
-            last_messages = await message.channel.history(limit=2).flatten()
+            last_messages = await channel.history(limit=2).flatten()
             author_id = str(last_messages[1].author.id)
             add_score(author_id, config["bump_score"])
             await message.channel.send(
@@ -78,27 +76,16 @@ async def on_message(message):
                 + config["score_name"]
                 + "!"
             )
-            set_scores(scores)
-    elif message.content.startswith(config["prefix"] + config["scores_command"]):
-        score_board = discord.Embed()
-        score_board.add_field(
-            name="Top "
-            + config["score_name"]
-            + " for **"
-            + message.channel.guild.name
-            + "**",
-            value="```" + config["top_emoji"] + " " + format_scores(scores) + "```",
-        )
-        await message.channel.send(embed=score_board)
+            await set_scores(scores)
 
 
-@client.event
+@bot.listen()
 async def on_reaction_add(reaction, user):
     if reaction.message.author == user:
         return  # if someone upvotes themselves, do nothing
-    if reaction.message.author == client.user:
+    if reaction.message.author == bot.user:
         return  # if someone upvotes the bot, do nothing
-    if user == client.user:
+    if user == bot.user:
         return  # if the bot made the reaction, do nothing
     # otherwise, we know it is a genuine reaction
 
@@ -108,16 +95,16 @@ async def on_reaction_add(reaction, user):
     elif reaction.emoji == config["downvote_emoji"]:
         add_score(author_id, -1)
 
-    set_scores(scores)
+    await set_scores(scores)
 
 
-@client.event
+@bot.listen()
 async def on_reaction_remove(reaction, user):
     if reaction.message.author == user:
         return  # if someone removes a reaction from themselves, do nothing
-    if reaction.message.author == client.user:
+    if reaction.message.author == bot.user:
         return  # if someone removes a reaction from the bot, do nothing
-    if user == client.user:
+    if user == bot.user:
         return  # if the bot removed the reaction, do nothing
     # otherwise, we know it is a genuine reaction
 
@@ -127,7 +114,20 @@ async def on_reaction_remove(reaction, user):
     elif reaction.emoji == config["downvote_emoji"]:
         add_score(author_id, 1)
 
-    set_scores(scores)
+    await set_scores(scores)
 
 
-client.run(config["token"])
+@bot.command(name=config["scores_command"])
+async def _scores(context):
+    score_board = Embed()
+    score_board.add_field(
+            name="Top "
+            + config["score_name"]
+            + " for **"
+            + context.message.channel.guild.name
+            + "**",
+            value="```" + config["top_emoji"] + " " + format_scores(scores) + "```",
+    )
+    await context.send(embed=score_board)
+
+bot.run(config["token"])
