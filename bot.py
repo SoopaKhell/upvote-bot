@@ -7,8 +7,6 @@ from re import match
 from re import findall
 import asyncio
 
-global scores
-
 config = get_config("config.json")
 scores = get_scores()
 bot = commands.Bot(command_prefix=config["prefix"])
@@ -18,6 +16,8 @@ yt_pattern = r"https?:\/\/(www\.)?(youtube\.com|youtu\.be)\/watch\?v=.+"
 
 def format_scores(d):
     """Makes the scores look pretty so we can print them in the embed"""
+    global scores
+
     d = {
         k: v for k, v in sorted(scores.items(), key=lambda item: item[1], reverse=True)
     }
@@ -49,6 +49,8 @@ def format_scores(d):
 
 def add_score(author_id, score):
     """Add score to to a user by id"""
+    global scores
+
     if author_id in scores:
         scores[author_id] += score
     else:
@@ -66,6 +68,8 @@ async def on_ready():
 
 @bot.listen()
 async def on_message(message):
+    global scores
+
     if message.author == bot.user:
         return  # if it's the bot's message, do nothing
     if message.attachments != [] or match(yt_pattern, message.content):
@@ -100,6 +104,8 @@ async def on_message(message):
 
 @bot.listen()
 async def on_reaction_add(reaction, user):
+    global scores
+
     if reaction.message.author == user:
         return  # if someone upvotes themselves, do nothing
     if reaction.message.author == bot.user:
@@ -119,6 +125,8 @@ async def on_reaction_add(reaction, user):
 
 @bot.listen()
 async def on_reaction_remove(reaction, user):
+    global scores
+
     if reaction.message.author == user:
         return  # if someone removes a reaction from themselves, do nothing
     if reaction.message.author == bot.user:
@@ -138,6 +146,8 @@ async def on_reaction_remove(reaction, user):
 
 @bot.command(name=config["scores_command"])
 async def _scores(context):
+    global scores
+
     score_board = Embed()
     score_board.add_field(
         name="Top " + config["score_name"] + " for **" + context.guild.name + "**",
