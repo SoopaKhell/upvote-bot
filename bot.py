@@ -4,7 +4,6 @@ from config import get_config
 from scores import get_scores
 from scores import set_scores
 from re import match
-from re import findall
 import asyncio
 
 config = get_config("config.json")
