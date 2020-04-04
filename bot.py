@@ -14,7 +14,7 @@ bot = commands.Bot(command_prefix=config["prefix"])
 yt_pattern = r"https?:\/\/(www\.)?(youtube\.com|youtu\.be)\/watch\?v=.+"
 
 
-def format_scores(d):
+def format_scores():
     """Makes the scores look pretty so we can print them in the embed"""
     global scores
 
@@ -146,12 +146,10 @@ async def on_reaction_remove(reaction, user):
 
 @bot.command(name=config["scores_command"])
 async def _scores(context):
-    global scores
-
     score_board = Embed()
     score_board.add_field(
         name="Top " + config["score_name"] + " for **" + context.guild.name + "**",
-        value="```" + config["top_emoji"] + " " + format_scores(scores) + "```",
+        value="```" + config["top_emoji"] + " " + format_scores() + "```",
     )
     await context.send(embed=score_board)
 
