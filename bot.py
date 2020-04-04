@@ -9,6 +9,7 @@ import asyncio
 
 config = get_config("config.json")
 scores = get_scores()
+users_to_notify = []  # Users to notify when they can bump again.
 bot = commands.Bot(command_prefix=config["prefix"])
 
 yt_pattern = r"https?:\/\/(www\.)?(youtube\.com|youtu\.be)\/watch\?v=.+"
@@ -57,6 +58,24 @@ def add_score(author_id, score):
         scores[author_id] = score
 
 
+async def notify_users_task():
+    global users_to_notify
+
+    await asyncio.sleep(7200)  # two hours
+    channel = bot.get_channel(config["bump_notify_channel"])
+
+    # Ping all users and empty the list
+    await channel.send(
+        f"You can bump now!\n\n{', '.join([user.mention for user in users_to_notify])}"
+    )
+    users_to_notify = []
+
+
+def task_done_callback(task: asyncio.Task):
+    if task.exception() and not isinstance(task.exception(), asyncio.CancelledError):
+        task.print_stack()
+
+
 @bot.listen()
 async def on_ready():
     print(
@@ -75,13 +94,17 @@ async def on_message(message):
     if message.attachments != [] or match(yt_pattern, message.content):
         await message.add_reaction(config["upvote_emoji"])
         await message.add_reaction(config["downvote_emoji"])
+
+    # TODO: make this not use a history call
     elif message.author.id == 302050872383242240:  # disboard bot id
+        last_messages = await message.channel.history(limit=2).flatten()
+        user = last_messages[1].author
+
         if "wait" not in message.embeds[0].description:
-            last_messages = await message.channel.history(limit=2).flatten()
-            author_id = str(last_messages[1].author.id)
+            author_id = str(user.id)
             add_score(author_id, config["bump_score"])
             await message.channel.send(
-                last_messages[1].author.mention
+                user.mention
                 + " thanks for the bump. Have "
                 + str(config["bump_score"])
                 + " "
@@ -89,16 +112,19 @@ async def on_message(message):
                 + "!"
             )
             await set_scores(scores)
+
+            # create/recreate reminder task:
+            task = asyncio.create_task(notify_users_task())
+            task.add_done_callback(task_done_callback)
         else:  # disboard gave a wait message
-            last_messages = await message.channel.history(limit=2).flatten()
-            time_to_wait = int(findall("\d+", message.embeds[0].description)[1])
+            if user not in users_to_notify:
+                users_to_notify.append(user)
+                await message.channel.send(
+                    f"{user.mention} I will notify you when you can bump the server."
+                )
+                return
             await message.channel.send(
-                last_messages[1].author.mention
-                + " I will notify you when you can bump the server."
-            )
-            await asyncio.sleep(60 * time_to_wait)
-            await message.channel.send(
-                last_messages[1].author.mention + " You can now bump the server!"
+                f"{user.mention} You're already on the list to be notified!"
             )
 
 

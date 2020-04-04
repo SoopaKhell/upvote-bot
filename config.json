@@ -9,5 +9,6 @@
 	"scores_command": "scores",
 	"score_name": "updoots",
 	"top_emoji": "★",
-	"bump_score": 5
+	"bump_score": 5,
+	"bump_notify_channel": 686370744837472256
 }
