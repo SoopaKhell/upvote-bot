@@ -85,12 +85,17 @@ async def on_message(message):
                 + "!"
             )
             await set_scores(scores)
-        else: #disboard gave a wait message
+        else:  # disboard gave a wait message
             last_messages = await message.channel.history(limit=2).flatten()
             time_to_wait = int(findall("\d+", message.embeds[0].description)[1])
-            await message.channel.send(last_messages[1].author.mention+" I will notify you when you can bump the server.")
-            await asyncio.sleep(60*time_to_wait)
-            await message.channel.send(last_messages[1].author.mention+" You can now bump the server!")
+            await message.channel.send(
+                last_messages[1].author.mention
+                + " I will notify you when you can bump the server."
+            )
+            await asyncio.sleep(60 * time_to_wait)
+            await message.channel.send(
+                last_messages[1].author.mention + " You can now bump the server!"
+            )
 
 
 @bot.listen()
