@@ -181,7 +181,7 @@ async def _scores(context):
     )
 
     paginator = commands.Paginator()
-    for index, line in enumerate(format_scores()):
+    for index, line in enumerate(format_scores().split("\n")):
         if index == 0:
             line = f"{config['top_emoji']} {line}"
         paginator.add_line(line)
