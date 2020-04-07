@@ -186,7 +186,7 @@ async def _scores(context):
             line = f"{config['top_emoji']} {line}"
         paginator.add_line(line)
 
-    interface = PaginatorEmbedInterface(paginator=paginator, embed=score_board)
+    interface = PaginatorEmbedInterface(paginator=paginator, embed=score_board, bot=bot)
     await interface.send_to(context)
 
 
