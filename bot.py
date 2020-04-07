@@ -5,6 +5,7 @@ from scores import get_scores
 from scores import set_scores
 from re import match
 import asyncio
+from jishaku.paginators import PaginatorEmbedInterface
 
 config = get_config("config.json")
 scores = get_scores()
@@ -171,12 +172,22 @@ async def on_reaction_remove(reaction, user):
 
 @bot.command(name=config["scores_command"])
 async def _scores(context):
-    score_board = Embed()
-    score_board.add_field(
-        name="Top " + config["score_name"] + " for **" + context.guild.name + "**",
-        value="```" + config["top_emoji"] + " " + format_scores() + "```",
+    score_board = Embed(
+        description="Top "
+        + config["score_name"]
+        + " for **"
+        + context.guild.name
+        + "**"
     )
-    await context.send(embed=score_board)
+
+    paginator = commands.Paginator()
+    for index, line in enumerate(format_scores()):
+        if index == 0:
+            line = f"{config['top_emoji']} {line}"
+        paginator.add_line(line)
+
+    interface = PaginatorEmbedInterface(paginator=paginator, embed=score_board)
+    await interface.send_to(context)
 
 
 bot.run(config["token"])
