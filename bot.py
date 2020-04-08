@@ -100,7 +100,7 @@ async def on_message(message):
         last_messages = await message.channel.history(limit=2).flatten()
         user = last_messages[1].author
 
-        if "wait" not in message.embeds[0].description:
+        if "Bump done" in message.embeds[0].description:
             author_id = str(user.id)
             add_score(author_id, config["bump_score"])
             await message.channel.send(
@@ -116,7 +116,7 @@ async def on_message(message):
             # create/recreate reminder task:
             task = asyncio.create_task(notify_users_task())
             task.add_done_callback(task_done_callback)
-        else:  # disboard gave a wait message
+        if "wait" in message.embeds[0].description:  # disboard gave a wait message
             if user not in users_to_notify:
                 users_to_notify.append(user)
                 await message.channel.send(
